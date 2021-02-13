@@ -286,7 +286,7 @@ void IGraphicsWin::OnDisplayTimer(int vBlankCount)
         {
           // we are late, skip the next vblank to give us a breather.
           mVBlankSkipUntil = curCount+1;
-          DBGMSG("vblank painting was late by %i frames.", (mVBlankSkipUntil - msgCount));
+          //DBGMSG("vblank painting was late by %i frames.", (mVBlankSkipUntil - msgCount));
         }
       }
     }
@@ -652,7 +652,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         pGraphics->Draw(rects);
 
         #ifdef IGRAPHICS_GL
-        SwapBuffers((HDC) pGraphics->mPlatformContext);
+        SwapBuffers((HDC) pGraphics->GetPlatformContext());
         pGraphics->DeactivateGLContext();
         #endif
 
@@ -1089,7 +1089,7 @@ void IGraphicsWin::ActivateGLContext()
 
 void IGraphicsWin::DeactivateGLContext()
 {
-  ReleaseDC(mPlugWnd, (HDC) mPlatformContext);
+  ReleaseDC(mPlugWnd, (HDC) GetPlatformContext());
   wglMakeCurrent(mStartHDC, mStartHGLRC); // return current ctxt to start
 }
 #endif
@@ -1645,7 +1645,6 @@ void IGraphicsWin::PromptForFile(WDL_String& fileName, WDL_String& path, EFileAc
       ofn.Flags |= OFN_OVERWRITEPROMPT;
       rc = GetSaveFileNameW(&ofn);
       break;
-            
     case EFileAction::Open:
       default:
       ofn.Flags |= OFN_FILEMUSTEXIST;
@@ -2224,13 +2223,7 @@ void IGraphicsWin::VBlankNotify()
 }
 
 #ifndef NO_IGRAPHICS
-#if defined IGRAPHICS_AGG
-  #include "IGraphicsAGG.cpp"
-#elif defined IGRAPHICS_CAIRO
-  #include "IGraphicsCairo.cpp"
-#elif defined IGRAPHICS_LICE
-  #include "IGraphicsLice.cpp"
-#elif defined IGRAPHICS_SKIA
+#if defined IGRAPHICS_SKIA
   #include "IGraphicsSkia.cpp"
   #ifdef IGRAPHICS_GL
     #include "glad.c"
@@ -2243,8 +2236,6 @@ void IGraphicsWin::VBlankNotify()
 #endif
   #include "nanovg.c"
   #include "glad.c"
-#elif defined IGRAPHICS_D2D
-  #include "IGraphicsD2D.cpp"
 #else
   #error
 #endif

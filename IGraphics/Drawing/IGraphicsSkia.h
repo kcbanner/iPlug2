@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IPlugPlatform.h"
-#include "IGraphicsPathBase.h"
+#include "IGraphics.h"
 
 // N.B. - this must be defined according to the skia build, not the iPlug build
 #if (defined OS_MAC || defined OS_IOS) && !defined IGRAPHICS_SKIA_NO_METAL
@@ -18,6 +18,7 @@
 #include "SkPath.h"
 #include "SkCanvas.h"
 #include "SkImage.h"
+#include "GrDirectContext.h"
 #pragma warning( pop )
 
 BEGIN_IPLUG_NAMESPACE
@@ -40,7 +41,7 @@ SkPaint SkiaPaint(const IPattern& pattern, const IBlend* pBlend);
 
 /** IGraphics draw class using Skia
 *   @ingroup DrawClasses */
-class IGraphicsSkia : public IGraphicsPathBase
+class IGraphicsSkia : public IGraphics
 {
 private:
   class Bitmap;
@@ -132,7 +133,8 @@ protected:
   APIBitmap* LoadAPIBitmap(const char* fileNameOrResID, int scale, EResourceLocation location, const char* ext) override;
   APIBitmap* LoadAPIBitmap(const char* name, const void* pData, int dataSize, int scale) override;
 private:
-    
+  void DrawImGui(SkSurface* surface);
+  
   void PrepareAndMeasureText(const IText& text, const char* str, IRECT& r, double& x, double & y, SkFont& font) const;
 
   void PathTransformSetMatrix(const IMatrix& m) override;
@@ -162,7 +164,7 @@ private:
   void* mMTLDrawable;
   void* mMTLLayer;
 #endif
-  
+
   static StaticStorage<Font> sFontCache;
 };
 

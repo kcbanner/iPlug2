@@ -114,6 +114,7 @@ void IControl::SetParamIdx(int paramIdx, int valIdx)
 {
   assert(valIdx > kNoValIdx && valIdx < NVals());
   mVals.at(valIdx).idx = paramIdx;
+  SetDirty(false);
 }
 
 const IParam* IControl::GetParam(int valIdx) const
@@ -465,6 +466,8 @@ void ITextControl::SetStr(const char* str)
     
     if(mSetBoundsBasedOnStr)
       SetBoundsBasedOnStr();
+    
+    SetDirty(false);
   }
 }
 
@@ -474,6 +477,8 @@ void ITextControl::SetStrFmt(int maxlen, const char* fmt, ...)
   va_start(arglist, fmt);
   mStr.SetAppendFormattedArgs(false, maxlen, fmt, arglist);
   va_end(arglist);
+  
+  SetDirty(false);
 }
 
 void ITextControl::Draw(IGraphics& g)
@@ -717,7 +722,6 @@ ISwitchControlBase::ISwitchControlBase(const IRECT& bounds, int paramIdx, IActio
 : IControl(bounds, paramIdx, aF)
 , mNumStates(numStates)
 {
-  assert(mNumStates > 1);
   mDisabledState.Resize(numStates);
   SetAllStatesDisabled(false);
   mDblAsSingleClick = true;
@@ -734,7 +738,7 @@ void ISwitchControlBase::SetAllStatesDisabled(bool disabled)
 
 void ISwitchControlBase::SetStateDisabled(int stateIdx, bool disabled)
 {
-  if(stateIdx >= 0 && stateIdx < mNumStates)
+  if(stateIdx >= 0 && stateIdx < mNumStates && mDisabledState.GetSize())
     mDisabledState.Get()[stateIdx] = disabled;
   
   SetDirty(false);
@@ -742,7 +746,7 @@ void ISwitchControlBase::SetStateDisabled(int stateIdx, bool disabled)
 
 bool ISwitchControlBase::GetStateDisabled(int stateIdx) const
 {
-  if(stateIdx >= 0 && stateIdx < mNumStates)
+  if(stateIdx >= 0 && stateIdx < mNumStates && mDisabledState.GetSize())
     return mDisabledState.Get()[stateIdx];
   return false;
 }

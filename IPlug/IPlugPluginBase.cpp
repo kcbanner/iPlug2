@@ -53,9 +53,8 @@ void IPluginBase::GetPluginVersionStr(WDL_String& str) const
 int IPluginBase::GetHostVersion(bool decimal) const
 {
   if (decimal)
-  {
     return GetDecimalVersion(mHostVersion);
-  }
+
   return mHostVersion;
 }
 
@@ -84,18 +83,20 @@ const char* IPluginBase::GetArchStr() const
 {
 #if defined OS_WEB
   return "WASM";
+#elif defined __aarch64__
+  return "arm64";
 #elif defined ARCH_64BIT
-  return "x64";
+  return "x86-64";
 #else
-  return "x86";
+  return "x86-32";
 #endif
 }
 
-void IPluginBase::GetBuildInfoStr(WDL_String& str) const
+void IPluginBase::GetBuildInfoStr(WDL_String& str, const char* date, const char* time) const
 {
   WDL_String version;
   GetPluginVersionStr(version);
-  str.SetFormatted(MAX_BUILD_INFO_STR_LEN, "%s version %s %s (%s), built on %s at %.5s ", GetPluginName(), version.Get(), GetAPIStr(), GetArchStr(), __DATE__, __TIME__);
+  str.SetFormatted(MAX_BUILD_INFO_STR_LEN, "%s %s (%s), built on %s at %.5s ", version.Get(), GetAPIStr(), GetArchStr(), date, time);
 }
 
 #pragma mark -
